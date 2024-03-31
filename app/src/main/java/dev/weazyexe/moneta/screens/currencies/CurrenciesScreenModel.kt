@@ -23,6 +23,7 @@ class CurrenciesScreenModel(
 
     override fun sink(event: CurrenciesEvent) {
         when (event) {
+            is CurrenciesEvent.SelectCurrency -> handleSelectCurrency(event)
             is CurrenciesEvent.OnBackClick -> handleBackClick()
             is CurrenciesEvent.OnCurrencyClick -> handleCurrencyClick(event)
             is CurrenciesEvent.OnSearchActiveChange -> changeSearchActivation(event)
@@ -34,6 +35,10 @@ class CurrenciesScreenModel(
         async { currenciesRepository.get() }
             .onEach { setState { copy(currencies = it) } }
             .launchIn(screenModelScope)
+
+    private fun handleSelectCurrency(event: CurrenciesEvent.SelectCurrency) {
+        setState { copy(selectedCurrency = event.selected) }
+    }
 
     private fun handleBackClick() {
         if (state.value.isSearchActive) {

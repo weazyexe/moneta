@@ -6,11 +6,14 @@ import dev.weazyexe.moneta.screens.currencies.viewstate.CurrencyViewState
 
 data class CurrenciesState(
     val currencies: AsyncResult<List<Currency>> = AsyncResult.Loading(),
+    val selectedCurrency: Currency? = null,
     val searchQuery: String = "",
     val isSearchActive: Boolean = false
 )
 
 sealed interface CurrenciesEvent {
+
+    data class SelectCurrency(val selected: Currency? = null) : CurrenciesEvent
 
     data object OnBackClick : CurrenciesEvent
 

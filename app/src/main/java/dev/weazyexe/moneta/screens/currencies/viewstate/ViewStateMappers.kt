@@ -14,13 +14,18 @@ fun currenciesViewState(
     context: Context
 ): CurrenciesViewState =
     CurrenciesViewState(
-        currencies = state.currencies.toViewState(state.searchQuery, context),
+        currencies = state.currencies.toViewState(
+            state.searchQuery,
+            state.selectedCurrency,
+            context
+        ),
         searchQuery = state.searchQuery,
         isSearchActive = state.isSearchActive
     )
 
 private fun AsyncResult<List<Currency>>.toViewState(
     searchQuery: String,
+    selectedCurrency: Currency? = null,
     context: Context
 ): AsyncResult<ImmutableList<CurrencyViewState>> =
     map { currencies ->
@@ -45,7 +50,7 @@ private fun AsyncResult<List<Currency>>.toViewState(
                             currency.symbol
                         )
                     },
-                    checked = false
+                    checked = currency.code == selectedCurrency?.code
                 )
             }.toImmutableList()
     }
