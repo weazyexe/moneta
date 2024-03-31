@@ -2,6 +2,7 @@ package dev.weazyexe.moneta.screens.currencies
 
 import android.content.Context
 import cafe.adriel.voyager.core.model.screenModelScope
+import dev.weazyexe.moneta.core.AsyncResult
 import dev.weazyexe.moneta.core.MonetaScreenModel
 import dev.weazyexe.moneta.domain.repository.CurrenciesRepository
 import dev.weazyexe.moneta.screens.currencies.viewstate.CurrenciesViewState
@@ -19,6 +20,7 @@ class CurrenciesScreenModel(
 
     init {
         loadCurrencies()
+        sink(CurrenciesEvent.OnSearchActiveChange(isActive = true))
     }
 
     override fun sink(event: CurrenciesEvent) {
@@ -44,12 +46,17 @@ class CurrenciesScreenModel(
         if (state.value.isSearchActive) {
             sink(CurrenciesEvent.OnSearchActiveChange(isActive = false))
         } else {
-            // Do navigation stuff
+            send(CurrenciesEffect.GoBack)
         }
     }
 
     private fun handleCurrencyClick(event: CurrenciesEvent.OnCurrencyClick) {
-        // Handle somehow
+        val currency = (state.value.currencies as? AsyncResult.Success)
+            ?.data
+            ?.find { it.code == event.code.origin }
+            ?: return
+
+        send(CurrenciesEffect.SelectCurrency(currency))
     }
 
     private fun changeSearchActivation(event: CurrenciesEvent.OnSearchActiveChange) {

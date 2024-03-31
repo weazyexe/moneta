@@ -15,22 +15,29 @@ sealed interface ConvertState {
 
     data class Amount(
         val currency: Currency,
-        val value: Double
+        val value: String
     )
 }
 
 sealed interface ConvertEvent {
 
-    data class FromAmountChange(val value: Double) : ConvertEvent
+    data class FromAmountChange(val value: String) : ConvertEvent
 
-    data class ToAmountChange(val value: Double) : ConvertEvent
+    data class ToAmountChange(val value: String) : ConvertEvent
 
-    data object FromCurrencyClick : ConvertEvent
+    data object OnFromCurrencyClick : ConvertEvent
 
-    data object ToCurrencyClick : ConvertEvent
+    data object OnToCurrencyClick : ConvertEvent
+
+    data class SelectFromCurrency(val currency: Currency) : ConvertEvent
+
+    data class SelectToCurrency(val currency: Currency) : ConvertEvent
 }
 
 sealed interface ConvertEffect {
 
-//    data class OpenCurrencyPicker
+    data class OpenCurrencyPicker(
+        val selectedCurrency: Currency,
+        val isFrom: Boolean
+    ) : ConvertEffect
 }

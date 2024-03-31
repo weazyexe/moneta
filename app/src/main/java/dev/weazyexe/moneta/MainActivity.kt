@@ -12,7 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.navigator.Navigator
-import dev.weazyexe.moneta.screens.currencies.CurrenciesScreen
+import cafe.adriel.voyager.transitions.SlideTransition
+import dev.weazyexe.moneta.screens.convert.ConvertScreen
 import dev.weazyexe.moneta.ui.theme.MonetaTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +27,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Navigator(screen = CurrenciesScreen())
+                    Navigator(screen = ConvertScreen()) { navigator ->
+                        SlideTransition(navigator)
+                    }
                 }
             }
         }

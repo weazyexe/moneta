@@ -4,5 +4,5 @@ import dev.weazyexe.moneta.screens.convert.ConvertScreenModel
 import org.koin.dsl.module
 
 val convertModule = module {
-    factory { ConvertScreenModel() }
+    factory { ConvertScreenModel(selectedCurrenciesRepository = get()) }
 }

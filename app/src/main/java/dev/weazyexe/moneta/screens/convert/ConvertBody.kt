@@ -20,14 +20,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -38,16 +41,48 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.weazyexe.moneta.R
+import dev.weazyexe.moneta.domain.model.Currency
 import dev.weazyexe.moneta.screens.convert.viewstate.AmountViewState
 import dev.weazyexe.moneta.screens.convert.viewstate.ConvertViewState
 import dev.weazyexe.moneta.screens.convert.viewstate.CurrencyViewState
+import dev.weazyexe.moneta.screens.currencies.CurrenciesScreen
+import dev.weazyexe.moneta.ui.extensions.ReceiveEffect
+import dev.weazyexe.moneta.ui.extensions.getResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConvertBody(
-    state: ConvertViewState
+    state: ConvertViewState,
+    eventSink: (ConvertEvent) -> Unit,
+    effects: Flow<ConvertEffect>
 ) {
+    val navigator = LocalNavigator.currentOrThrow
+    var isFrom by rememberSaveable { mutableStateOf(true) }
+    val newlySelectedCurrency by navigator.getResult<Currency>(screenKey = CurrenciesScreen().key)
+
+    ReceiveEffect(effects) {
+        when (this) {
+            is ConvertEffect.OpenCurrencyPicker -> {
+                isFrom = this.isFrom
+                navigator.push(CurrenciesScreen(selectedCurrency))
+            }
+        }
+    }
+
+    LaunchedEffect(newlySelectedCurrency) {
+        val currency = newlySelectedCurrency ?: return@LaunchedEffect
+        if (isFrom) {
+            eventSink(ConvertEvent.SelectFromCurrency(currency))
+        } else {
+            eventSink(ConvertEvent.SelectToCurrency(currency))
+        }
+    }
+
     Scaffold(
         topBar = {
             LargeTopAppBar(title = { Text(text = stringResource(id = R.string.convert_title)) })
@@ -74,7 +109,8 @@ fun ConvertBody(
                     CurrencyConvertField(
                         amount = state.from,
                         actionTitle = stringResource(id = R.string.convert_pick_from_currency),
-                        onClick = { /*TODO*/ },
+                        onClick = { eventSink(ConvertEvent.OnFromCurrencyClick) },
+                        onValueChange = { eventSink(ConvertEvent.FromAmountChange(it)) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -83,7 +119,8 @@ fun ConvertBody(
                     CurrencyConvertField(
                         amount = state.to,
                         actionTitle = stringResource(id = R.string.convert_pick_to_currency),
-                        onClick = { /*TODO*/ },
+                        onClick = { eventSink(ConvertEvent.OnToCurrencyClick) },
+                        onValueChange = { eventSink(ConvertEvent.ToAmountChange(it)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -97,6 +134,7 @@ private fun CurrencyConvertField(
     amount: AmountViewState,
     actionTitle: String,
     onClick: () -> Unit,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isActive by remember { mutableStateOf(false) }
@@ -126,7 +164,7 @@ private fun CurrencyConvertField(
 
         CurrencyTextField(
             amount = amount,
-            onValueChange = { /*TODO*/ },
+            onValueChange = onValueChange,
             modifier = Modifier.weight(1f),
             onFocusChange = { isActive = it }
         )
@@ -197,26 +235,51 @@ private fun CurrencyBlock(
 @Composable
 private fun CurrencyTextField(
     amount: AmountViewState,
-    onValueChange: (Number) -> Unit,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     onFocusChange: (Boolean) -> Unit = {}
 ) {
     BasicTextField(
-        value = amount.value.toString(),
-        onValueChange = {
-            it.toDoubleOrNull()?.let { value ->
-                if (value % 1.0 == 0.0) {
-                    onValueChange(value.toInt())
-                } else {
-                    onValueChange(value)
+        value = amount.value,
+        onValueChange = { textFieldValue ->
+            /*if (value.isEmpty()) {
+                onValueChange("")
+            } else {
+                onValueChange(
+                    when (value.toDoubleOrNull()) {
+                        null -> amount.value
+                        else -> value
+                    }
+                )
+            }*/
+            textFieldValue.forEach {
+                if (!it.isDigit() && it != '.' && it != ',') {
+                    return@BasicTextField
                 }
             }
+
+            onValueChange(textFieldValue)
+            /*if (textFieldValue.isEmpty()) {
+                onValueChange(null)
+                return@BasicTextField
+            }
+
+            val numberValue = textFieldValue.toDoubleOrNull() ?: return@BasicTextField
+
+            if (numberValue % 1.0 == 0.0) {
+                onValueChange(numberValue.toInt())
+            } else {
+
+            }*/
         },
         modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { onFocusChange(it.hasFocus) },
         singleLine = true,
-        textStyle = MaterialTheme.typography.titleLarge,
+        textStyle = MaterialTheme.typography.titleLarge.copy(
+            color = MaterialTheme.colorScheme.onSurface
+        ),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         decorationBox = { innerTextField ->
             Row {
@@ -244,7 +307,11 @@ private fun CurrencyTextField(
 @Preview
 @Composable
 private fun ConvertScreenContentPreview() {
-    ConvertBody(state = ConvertScreenPreviews.Default)
+    ConvertBody(
+        state = ConvertScreenPreviews.Default,
+        eventSink = {},
+        effects = emptyFlow()
+    )
 }
 
 private data object ConvertScreenPreviews {
@@ -257,7 +324,7 @@ private data object ConvertScreenPreviews {
                 title = "Euro",
                 symbol = "€"
             ),
-            value = 100.0
+            value = "100"
         ),
         to = AmountViewState(
             currency = CurrencyViewState(
@@ -266,7 +333,7 @@ private data object ConvertScreenPreviews {
                 title = "Russian Ruble",
                 symbol = "₽"
             ),
-            value = 10_000.0
+            value = "10000"
         )
     )
 }

@@ -17,7 +17,7 @@ sealed interface ConvertViewState {
 
 data class AmountViewState(
     val currency: CurrencyViewState,
-    val value: Double
+    val value: String
 )
 
 data class CurrencyViewState(

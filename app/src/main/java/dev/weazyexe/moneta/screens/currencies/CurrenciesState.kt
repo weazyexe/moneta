@@ -26,5 +26,9 @@ sealed interface CurrenciesEvent {
 
 sealed interface CurrenciesEffect {
 
+    data object GoBack : CurrenciesEffect
+
     data object FocusSearchTextField : CurrenciesEffect
+
+    data class SelectCurrency(val currency: Currency) : CurrenciesEffect
 }

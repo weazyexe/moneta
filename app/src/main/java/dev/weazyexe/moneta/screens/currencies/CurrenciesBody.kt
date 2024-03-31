@@ -1,5 +1,6 @@
 package dev.weazyexe.moneta.screens.currencies
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +39,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.weazyexe.moneta.R
 import dev.weazyexe.moneta.core.AsyncResult
 import dev.weazyexe.moneta.screens.currencies.viewstate.CurrenciesViewState
@@ -45,6 +48,7 @@ import dev.weazyexe.moneta.screens.currencies.viewstate.CurrencyViewState
 import dev.weazyexe.moneta.ui.core.IconButton
 import dev.weazyexe.moneta.ui.core.SearchTextField
 import dev.weazyexe.moneta.ui.extensions.ReceiveEffect
+import dev.weazyexe.moneta.ui.extensions.popWithResult
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +64,7 @@ fun CurrenciesBody(
 ) {
     val nestedScroll = TopAppBarDefaults.pinnedScrollBehavior()
     val searchFieldFocus = remember { FocusRequester() }
+    val navigator = LocalNavigator.currentOrThrow
 
     ReceiveEffect(effects) {
         when (this) {
@@ -67,7 +72,19 @@ fun CurrenciesBody(
                 delay(200L)
                 searchFieldFocus.requestFocus()
             }
+
+            CurrenciesEffect.GoBack -> {
+                navigator.pop()
+            }
+
+            is CurrenciesEffect.SelectCurrency -> {
+                navigator.popWithResult(CurrenciesScreen().key, currency)
+            }
         }
+    }
+
+    BackHandler {
+        eventSink(CurrenciesEvent.OnBackClick)
     }
 
     Scaffold(
@@ -82,6 +99,9 @@ fun CurrenciesBody(
                                 eventSink(CurrenciesEvent.OnSearchFieldTextChange(it))
                             },
                             placeholder = stringResource(id = R.string.currencies_title_search_hint),
+                            textStyle = MaterialTheme.typography.titleLarge.copy(
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
                             modifier = Modifier.focusRequester(searchFieldFocus)
                         )
                     } else {
