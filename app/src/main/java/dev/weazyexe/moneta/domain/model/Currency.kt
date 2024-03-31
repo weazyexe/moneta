@@ -1,5 +1,8 @@
-package dev.weazyexe.moneta.domain
+package dev.weazyexe.moneta.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Currency(
     val symbol: String,
     val name: String,

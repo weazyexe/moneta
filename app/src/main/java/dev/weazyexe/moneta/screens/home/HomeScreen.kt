@@ -1,7 +1,12 @@
 package dev.weazyexe.moneta.screens.home
 
-import com.slack.circuit.runtime.screen.Screen
-import kotlinx.parcelize.Parcelize
+import androidx.compose.runtime.Composable
+import cafe.adriel.voyager.core.screen.Screen
 
-@Parcelize
-data object HomeScreen : Screen
+data object HomeScreen : Screen {
+
+    @Composable
+    override fun Content() {
+
+    }
+}
