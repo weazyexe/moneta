@@ -49,7 +49,7 @@ private class CurrencyDto(
 
     fun toCurrency() = Currency(
         symbol = symbol,
-        name = name,
+        title = name,
         code = code,
         emoji = emoji
     )

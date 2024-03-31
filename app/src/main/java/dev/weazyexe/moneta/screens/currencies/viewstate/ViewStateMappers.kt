@@ -32,7 +32,7 @@ private fun AsyncResult<List<Currency>>.toViewState(
         currencies
             .filter {
                 it.code.contains(searchQuery, ignoreCase = true) ||
-                        it.name.contains(searchQuery, ignoreCase = true) ||
+                        it.title.contains(searchQuery, ignoreCase = true) ||
                         it.symbol.contains(searchQuery, ignoreCase = true) ||
                         it.emoji.contains(searchQuery, ignoreCase = true)
             }
@@ -40,7 +40,7 @@ private fun AsyncResult<List<Currency>>.toViewState(
                 CurrencyViewState(
                     code = CurrencyViewState.Code(currency.code),
                     emoji = currency.emoji,
-                    title = currency.name,
+                    title = currency.title,
                     subtitle = if (currency.code == currency.symbol) {
                         currency.code
                     } else {

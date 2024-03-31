@@ -9,4 +9,8 @@
     <string name="currencies_title_search_hint">Search for currency…</string>
     <string name="currencies_currency_subtitle">%s, %s</string>
     <string name="currencies_error">Error while loading currencies 💀</string>
+
+    <string name="convert_title">Convert</string>
+    <string name="convert_pick_from_currency">Pick from currency</string>
+    <string name="convert_pick_to_currency">Pick to currency</string>
 </resources>

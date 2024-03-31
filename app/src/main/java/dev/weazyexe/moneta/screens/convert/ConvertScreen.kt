@@ -1,12 +1,14 @@
-package dev.weazyexe.moneta.screens.home
+package dev.weazyexe.moneta.screens.convert
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
 
-data object HomeScreen : Screen {
+class ConvertScreen : Screen {
 
     @Composable
     override fun Content() {
 
     }
+
+
 }
