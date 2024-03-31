@@ -1,25 +1,40 @@
 package dev.weazyexe.moneta.core
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
-abstract class MonetaScreenModel<S, VS>(
-    initialState: S,
-    viewStateMapper: (S) -> VS
+abstract class MonetaScreenModel<State, ViewState, UiEvent, UiEffect>(
+    initialState: State,
+    viewStateMapper: (State) -> ViewState
 ) : ScreenModel {
 
-    private val _state: MutableStateFlow<S> = MutableStateFlow(initialState)
-    protected val state: StateFlow<S> = _state.asStateFlow()
+    private val _state: MutableStateFlow<State> = MutableStateFlow(initialState)
+    protected val state: StateFlow<State> = _state.asStateFlow()
 
-    val viewState: StateFlow<VS> = state.mapState { viewStateMapper(it) }
+    val viewState: StateFlow<ViewState> = state.mapState { viewStateMapper(it) }
 
-    fun setState(reducer: S.() -> S) {
+    private val _effects = Channel<UiEffect>(Channel.BUFFERED)
+    val effects: Flow<UiEffect> = _effects.receiveAsFlow()
+
+    abstract fun sink(event: UiEvent)
+
+    fun send(effect: UiEffect) {
+        screenModelScope.launch {
+            _effects.send(effect)
+        }
+    }
+
+    fun setState(reducer: State.() -> State) {
         _state.value = _state.value.reducer()
     }
 

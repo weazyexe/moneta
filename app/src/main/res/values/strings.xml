@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">moneta</string>
+
+    <string name="content_description_back">Back</string>
+    <string name="content_description_search">Search</string>
+    <string name="content_description_clear_search_field">Clear the search field</string>
+
     <string name="currencies_title">Currencies</string>
+    <string name="currencies_title_search_hint">Search for currency…</string>
     <string name="currencies_currency_subtitle">%s, %s</string>
     <string name="currencies_error">Error while loading currencies 💀</string>
 </resources>

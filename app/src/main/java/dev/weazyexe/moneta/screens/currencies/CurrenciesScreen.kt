@@ -13,6 +13,10 @@ data object CurrenciesScreen : Screen {
         val screenModel = getScreenModel<CurrenciesScreenModel>()
         val state by screenModel.viewState.collectAsState()
 
-        CurrenciesBody(state)
+        CurrenciesBody(
+            state = state,
+            eventSink = screenModel::sink,
+            effects = screenModel.effects
+        )
     }
 }

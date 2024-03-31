@@ -6,7 +6,9 @@ import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
 data class CurrenciesViewState(
-    val currencies: AsyncResult<ImmutableList<CurrencyViewState>>
+    val currencies: AsyncResult<ImmutableList<CurrencyViewState>>,
+    val searchQuery: String,
+    val isSearchActive: Boolean
 )
 
 @Immutable
