@@ -182,10 +182,10 @@
     "emoji": "🇧🇼"
   },
   {
-    "symbol": "BYR",
+    "symbol": "BYN",
     "name": "Belarusian Ruble",
-    "symbol_native": "BYR",
-    "code": "BYR",
+    "symbol_native": "BYN",
+    "code": "BYN",
     "emoji": "🇧🇾"
   },
   {
@@ -292,13 +292,6 @@
     "symbol_native": "د.ج.‏",
     "code": "DZD",
     "emoji": "🇩🇿"
-  },
-  {
-    "symbol": "Ekr",
-    "name": "Estonian Kroon",
-    "symbol_native": "kr",
-    "code": "EEK",
-    "emoji": "🇪🇪"
   },
   {
     "symbol": "EGP",
@@ -595,25 +588,11 @@
     "emoji": "🇱🇷"
   },
   {
-    "symbol": "Lt",
-    "name": "Lithuanian Litas",
-    "symbol_native": "Lt",
-    "code": "LTL",
-    "emoji": "🇱🇹"
-  },
-  {
     "symbol": "L",
     "name": "Basotho Loti",
     "symbol_native": "L",
     "code": "LSL",
     "emoji": "🇱🇸"
-  },
-  {
-    "symbol": "Ls",
-    "name": "Latvian Lats",
-    "symbol_native": "Ls",
-    "code": "LVL",
-    "emoji": "🇱🇻"
   },
   {
     "symbol": "LD",
@@ -1127,10 +1106,10 @@
     "emoji": "🇿🇦"
   },
   {
-    "symbol": "ZK",
+    "symbol": "ZMW",
     "name": "Zambian Kwacha",
-    "symbol_native": "ZK",
-    "code": "ZMK",
+    "symbol_native": "ZMW",
+    "code": "ZMW",
     "emoji": "🇿🇲"
   },
   {
